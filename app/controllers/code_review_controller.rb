@@ -119,12 +119,16 @@ class CodeReviewController < ApplicationController
           change_id = params[:change_id].to_i unless params[:change_id].blank?
           @review.change = Change.find(change_id) if change_id
           @review.line = params[:line].to_i unless params[:line].blank?
-          if (@review.changeset and @review.changeset.user_id)
-            @review.issue.assigned_to_id = @review.changeset.user_id
+          changeset = @review.changeset
+          if changeset.blank? && @repository && params[:rev].present?
+            changeset = @repository.find_changeset_by_name(params[:rev])
+          end
+          if (changeset and changeset.user_id)
+            @review.issue.assigned_to_id = changeset.user_id
           end
           @default_version_id = @review.issue.fixed_version.id if @review.issue.fixed_version
-          if @review.changeset and @default_version_id.blank?
-            @review.changeset.issues.each {|issue|
+          if changeset and @default_version_id.blank?
+            changeset.issues.each {|issue|
               if issue.fixed_version
                 copy_custom_field(issue, @review.issue)
                 @review.issue.assigned_to_id = issue.assigned_to_id unless @review.issue.assigned_to_id
