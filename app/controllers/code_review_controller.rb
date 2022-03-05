@@ -88,7 +88,9 @@ class CodeReviewController < ApplicationController
         @parent_candidate = get_parent_candidate(@review.rev) if  @review.rev
 
         if request.post?
+          call_hook(:controller_issues_new_before_save, { params: params, issue: @issue })
           @review.issue.save!
+          call_hook(:controller_issues_new_after_save, { params: params, issue: @issue })
           if @review.changeset
             @review.changeset.issues.each {|issue|
               create_relation @review, issue, @setting.issue_relation_type
@@ -308,7 +310,9 @@ class CodeReviewController < ApplicationController
       @review.assign_attributes(params[:review])
       @allowed_statuses = @issue.new_statuses_allowed_to(User.current)
 
+      call_hook(:controller_issues_edit_before_save, { params: params, issue: @issue, journal: @issue.current_journal })
       @issue.save!
+      call_hook(:controller_issues_edit_after_save, { params: params, issue: @issue, journal: @issue.current_journal })
       if !journal.new_record?
         # Only send notification if something was actually changed
         flash[:notice] = l(:notice_successful_update)
