@@ -127,6 +127,7 @@ class CodeReviewController < ApplicationController
           if @review.changeset and @default_version_id.blank?
             @review.changeset.issues.each { |issue|
               if issue.fixed_version
+                @review.issue.assigned_to_id = issue.assigned_to_id unless @review.issue.assigned_to_id
                 @default_version_id = issue.fixed_version.id
                 break
               end
@@ -134,6 +135,7 @@ class CodeReviewController < ApplicationController
           end
           @review.open_assignment_issues(@user.id).each { |issue|
             if issue.fixed_version
+              @review.issue.assigned_to_id = issue.assigned_to_id unless @review.issue.assigned_to_id
               @default_version_id = issue.fixed_version.id
               break
             end
