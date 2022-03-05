@@ -136,6 +136,12 @@ class CodeReviewController < ApplicationController
               break
             end
           } unless @default_version_id
+          if @review.attachment and @review.attachment.container_type = 'Issue'
+            issue = @review.attachment.container
+            @review.issue.assigned_to_id = issue.assigned_to_id unless @review.issue.assigned_to_id
+            @default_version_id = issue.fixed_version_id unless @default_version_id
+          end
+
           render partial: 'new_form', status: 200
         end
       }
