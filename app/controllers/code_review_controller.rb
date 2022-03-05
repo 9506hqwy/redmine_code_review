@@ -138,6 +138,7 @@ class CodeReviewController < ApplicationController
           } unless @default_version_id
           if @review.attachment and @review.attachment.container_type = 'Issue'
             issue = @review.attachment.container
+            copy_custom_field(issue, @review.issue)
             @review.issue.assigned_to_id = issue.assigned_to_id unless @review.issue.assigned_to_id
             @default_version_id = issue.fixed_version_id unless @default_version_id
           end
@@ -149,6 +150,15 @@ class CodeReviewController < ApplicationController
       logger.error e
       render partial: 'new_form', status: 200
     end
+  end
+
+  def copy_custom_field(source, destination)
+    destination.custom_field_values.each { |dcv|
+      if dcv.required?
+        scv = source.custom_field_values.find { |v| v.custom_field_id == dcv.custom_field_id }
+        dcv.value = scv.value if scv.present?
+      end
+    }
   end
 
   def assign
