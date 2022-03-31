@@ -255,8 +255,18 @@ class CodeReviewController < ApplicationController
         url << '?review_id=' + @review.id.to_s if @review
       else
         path = nil if target.diff_all
+        repository_id = @repository_id
+        unless repository_id
+          @review.project.repositories.each do |repository|
+            cset = repository.changesets.find_by(revision: @review.rev)
+            if cset
+              repository_id = repository.id
+              break
+            end
+          end
+        end
         url = url_for(controller: 'repositories', action: action_name,
-                      id: @project, repository_id: @repository_id,
+                      id: @project, repository_id: repository_id,
                       rev: target.revision, path: path)
         url << '?review_id=' + @review.id.to_s + rev_to if @review
         url << '?r=' + rev_to unless @review
