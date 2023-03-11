@@ -140,9 +140,14 @@ function setAddReviewButton(url, change_id, image_tag, is_readonly, is_diff, att
 
       var th_html = th.innerHTML;
 
-      var line = th_html.match(/[0-9]+/);
-      if (line == null) {
-        continue;
+      var line = th.dataset.txt
+      if (line == undefined) {
+        var line = th_html.match(/[0-9]+/);
+        if (line == null) {
+          continue;
+        }
+      } else if (line == "") {
+          continue;
       }
 
       var span_html = '<span white-space="nowrap" id="review_span_' + line + '_' + i + '">';
