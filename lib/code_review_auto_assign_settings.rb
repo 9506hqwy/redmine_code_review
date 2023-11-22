@@ -154,7 +154,8 @@ module CodeReviewAutoAssignSettings
     end
 
     def load_yml(yml_string)
-      @yml = YAML.load(yml_string)
+      # https://github.com/ruby/psych/pull/487
+      @yml = YAML.respond_to?(:unsafe_load) ? YAML.unsafe_load(yml_string) : YAML.load(yml_string)
     end
 
     def select_assign_to_with_list(project, list, commiter_id = nil)
