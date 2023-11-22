@@ -278,7 +278,7 @@ class CodeReviewController < ApplicationController
       if action_name == 'attachment'
         attachment = target.attachment
         url = url_for(controller: 'attachments', action: 'show',
-                      id: attachment.id) + '/' + URI.encode(attachment.filename)
+                      id: attachment.id) + '/' + URI.encode_www_form_component(attachment.filename)
         url << '?review_id=' + @review.id.to_s if @review
       else
         path = nil if target.diff_all
